@@ -13,9 +13,14 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "db:seed": "ts-node src/database/run-seed.ts"
   },
-  "keywords": ["nestjs", "typescript", "api"],
+  "keywords": [
+    "nestjs",
+    "typescript",
+    "api"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -24,14 +29,20 @@
     "@nestjs/core": "^11.1.9",
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/platform-express": "^11.1.9",
+    "@nestjs/typeorm": "^11.0.0",
+    "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
+    "dotenv": "^17.2.3",
+    "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "typeorm": "^0.3.27"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.9",
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.1",
     "ts-node": "^10.9.2",
