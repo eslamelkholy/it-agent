@@ -6,6 +6,8 @@ import { ClientModule } from './modules/client/client.module';
 import { UserModule } from './modules/user/user.module';
 import { RmmModule } from './modules/rmm/rmm.module';
 import { PsaModule } from './modules/psa/psa.module';
+import { RagModule } from './modules/rag/rag.module';
+import { AlphoraAgentModule } from './modules/alphora-agent/alphora-agent.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { PsaModule } from './modules/psa/psa.module';
     ClientModule,
     UserModule,
     RmmModule,
+    RagModule,
+    AlphoraAgentModule,
     PsaModule,
   ],
   controllers: [],
