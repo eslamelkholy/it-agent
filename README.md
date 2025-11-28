@@ -1,6 +1,6 @@
 # IT Agent - NestJS Application
 
-Alphra App
+Alphora Agent 101 — Europe's first AI-Native MSP Support Platform. An AI agent that autonomously resolves L1/L2 IT support tickets by orchestrating actions across PSA systems, RMM tools, and remote access solutions.
 
 ## Installation
 
@@ -12,18 +12,40 @@ npm install
 
 Copy `.env.example` to `.env` and configure:
 
+```bash
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=it_agent
+
+# OpenAI
+OPENAI_API_KEY=sk-...
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+EMBEDDING_DIMENSION=1536
+```
+
 ## Running the Application
 
 ```bash
+# Start PostgreSQL with pgvector
+docker-compose up -d postgres
+
+# Development
 npm run start:dev
 
+# Production
 npm run build
 npm run start:prod
+
+# Seed database
+npm run db:seed
 ```
 
+## Ticket Processing Flow
 
-
-# Ticketing Processing Flow
+```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  1. WEBHOOK RECEIVES TICKET                                                  │
 │     POST /psa/webhook/tickets                                               │
@@ -92,3 +114,21 @@ npm run start:prod
                                     │                                │
                                     │  Future: Execute via RMM/API   │
                                     └────────────────────────────────┘
+```
+
+## Example
+
+**Ticket comes in:**
+```json
+{
+  "clientId": "cisco-uuid",
+  "title": "Password expired - cannot login",
+  "body": "User John cannot login, password expired"
+}
+```
+
+**Agent processes:**
+1. **Intent**: `password_reset` (confidence: 0.75)
+2. **KB Search**: Finds "Active Directory Password Reset Procedure" (similarity: 0.92)
+3. **Decision**: AUTOMATE ✓
+4. **Action Plan**: 4 steps using `active_directory` and `secure_messaging` tools
