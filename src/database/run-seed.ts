@@ -3,6 +3,8 @@ import { Client } from '../modules/client/entities/client.entity';
 import { User } from '../modules/user/entities/user.entity';
 import { RmmDevice } from '../modules/rmm/entities/rmm-device.entity';
 import { RmmAction } from '../modules/rmm/entities/rmm-action.entity';
+import { Ticket } from '../modules/psa/entities/ticket.entity';
+import { TicketAttachment } from '../modules/psa/entities/ticket-attachment.entity';
 import { seedDatabase } from './seed';
 import * as dotenv from 'dotenv';
 
@@ -15,7 +17,7 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'it_agent',
-  entities: [Client, User, RmmDevice, RmmAction],
+  entities: [Client, User, RmmDevice, RmmAction, Ticket, TicketAttachment],
   synchronize: true,
 });
 
