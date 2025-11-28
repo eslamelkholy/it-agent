@@ -5,6 +5,7 @@ import { HealthModule } from './modules/health/health.module';
 import { ClientModule } from './modules/client/client.module';
 import { UserModule } from './modules/user/user.module';
 import { RmmModule } from './modules/rmm/rmm.module';
+import { PsaModule } from './modules/psa/psa.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RmmModule } from './modules/rmm/rmm.module';
     ClientModule,
     UserModule,
     RmmModule,
+    PsaModule,
   ],
   controllers: [],
   providers: [],

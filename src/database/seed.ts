@@ -4,6 +4,8 @@ import { Client, ClientStatus } from '../modules/client/entities/client.entity';
 import { User, UserRole, UserStatus } from '../modules/user/entities/user.entity';
 import { RmmDevice, DeviceType, OsType, DeviceStatus, RmmPlatform } from '../modules/rmm/entities/rmm-device.entity';
 import { RmmAction, ActionType, ActionStatus } from '../modules/rmm/entities/rmm-action.entity';
+import { Ticket, TicketStatus, TicketPriority } from '../modules/psa/entities/ticket.entity';
+import { TicketAttachment } from '../modules/psa/entities/ticket-attachment.entity';
 
 const BCRYPT_SALT_ROUNDS = 12;
 const SEED_PASSWORD = 'SecureP@ssw0rd123';
@@ -13,6 +15,8 @@ export async function seedDatabase(dataSource: DataSource): Promise<void> {
   const userRepo = dataSource.getRepository(User);
   const deviceRepo = dataSource.getRepository(RmmDevice);
   const actionRepo = dataSource.getRepository(RmmAction);
+  const ticketRepo = dataSource.getRepository(Ticket);
+  const attachmentRepo = dataSource.getRepository(TicketAttachment);
 
   const existingClients = await clientRepo.count();
   if (existingClients > 0) {
@@ -244,5 +248,120 @@ export async function seedDatabase(dataSource: DataSource): Promise<void> {
   await actionRepo.save(action5);
 
   console.log('✓ Created sample RMM actions');
+
+  const ticket1 = ticketRepo.create({
+    clientId: cisco.id,
+    rmmDeviceId: ciscoWks001.id,
+    assignedTo: islam.id,
+    title: 'Password expired - cannot login to workstation',
+    body: 'User John Smith reports his Windows password has expired and he cannot log into his workstation CISCO-WS-001. He needs urgent access for a client meeting in 30 minutes.',
+    status: TicketStatus.IN_PROGRESS,
+    priority: TicketPriority.URGENT,
+    externalTicketId: 'CW-10042',
+  });
+  await ticketRepo.save(ticket1);
+
+  const ticket2 = ticketRepo.create({
+    clientId: cisco.id,
+    rmmDeviceId: ciscoSrv001.id,
+    assignedTo: daniel.id,
+    title: 'Exchange server backup failed overnight',
+    body: 'The scheduled backup job for the Exchange server failed at 3:00 AM with error code 0x80070005. Previous backups were successful. Please investigate and ensure backup completes before end of business.',
+    status: TicketStatus.NEW,
+    priority: TicketPriority.HIGH,
+    externalTicketId: 'CW-10043',
+  });
+  await ticketRepo.save(ticket2);
+
+  const ticket3 = ticketRepo.create({
+    clientId: acme.id,
+    rmmDeviceId: acmeWks001.id,
+    assignedTo: kuba.id,
+    title: 'Cannot access shared network drives',
+    body: 'Multiple users in the accounting department are reporting they cannot access the shared drive \\\\ACME-SRV\\Finance. Error: "The specified network name is no longer available." Started occurring after this morning\'s Windows update.',
+    status: TicketStatus.IN_PROGRESS,
+    priority: TicketPriority.HIGH,
+    externalTicketId: 'AT-55821',
+  });
+  await ticketRepo.save(ticket3);
+
+  const ticket4 = ticketRepo.create({
+    clientId: acme.id,
+    title: 'Request for new user account setup',
+    body: 'New employee Maria Garcia starting on Monday. Please create Active Directory account, email mailbox, and VPN access. Department: Human Resources. Manager: Robert Chen.',
+    status: TicketStatus.NEW,
+    priority: TicketPriority.MEDIUM,
+    externalTicketId: 'AT-55822',
+  });
+  await ticketRepo.save(ticket4);
+
+  const ticket5 = ticketRepo.create({
+    clientId: alphora.id,
+    assignedTo: david.id,
+    title: 'Outlook keeps crashing when opening attachments',
+    body: 'CFO reports that Outlook 365 crashes consistently when trying to open PDF attachments. Already tried restarting the application and clearing the cache. Issue persists across multiple emails.',
+    status: TicketStatus.IN_PROGRESS,
+    priority: TicketPriority.MEDIUM,
+    externalTicketId: 'HP-8891',
+  });
+  await ticketRepo.save(ticket5);
+
+  const ticket6 = ticketRepo.create({
+    clientId: alphora.id,
+    assignedTo: david.id,
+    title: 'VPN connection drops frequently',
+    body: 'Remote workers are experiencing intermittent VPN disconnections. Affects approximately 15 users. Connection drops every 30-45 minutes. Using Cisco AnyConnect client version 4.10.',
+    status: TicketStatus.RESOLVED,
+    priority: TicketPriority.HIGH,
+    externalTicketId: 'HP-8889',
+  });
+  await ticketRepo.save(ticket6);
+
+  const ticket7 = ticketRepo.create({
+    clientId: cisco.id,
+    rmmDeviceId: ciscoLaptop045.id,
+    title: 'Slow laptop performance after update',
+    body: 'Laptop running extremely slow after last Windows update. Boot time increased from 30 seconds to over 3 minutes. Applications take a long time to open. 16GB RAM, 512GB SSD, Intel i7.',
+    status: TicketStatus.CLOSED,
+    priority: TicketPriority.LOW,
+    externalTicketId: 'CW-10039',
+  });
+  await ticketRepo.save(ticket7);
+
+  console.log('✓ Created sample PSA tickets');
+
+  const attachment1 = attachmentRepo.create({
+    ticketId: ticket1.id,
+    fileName: 'password_expired_screenshot.png',
+    fileUrl: 'https://storage.alphora.io/attachments/cisco/cw-10042/password_expired_screenshot.png',
+    fileType: 'image/png',
+  });
+  await attachmentRepo.save(attachment1);
+
+  const attachment2 = attachmentRepo.create({
+    ticketId: ticket2.id,
+    fileName: 'backup_error_log.txt',
+    fileUrl: 'https://storage.alphora.io/attachments/cisco/cw-10043/backup_error_log.txt',
+    fileType: 'text/plain',
+  });
+  await attachmentRepo.save(attachment2);
+
+  const attachment3 = attachmentRepo.create({
+    ticketId: ticket3.id,
+    fileName: 'network_error_screenshot.png',
+    fileUrl: 'https://storage.alphora.io/attachments/acme/at-55821/network_error_screenshot.png',
+    fileType: 'image/png',
+  });
+  await attachmentRepo.save(attachment3);
+
+  const attachment4 = attachmentRepo.create({
+    ticketId: ticket5.id,
+    fileName: 'outlook_crash_dump.log',
+    fileUrl: 'https://storage.alphora.io/attachments/alphora/hp-8891/outlook_crash_dump.log',
+    fileType: 'text/plain',
+  });
+  await attachmentRepo.save(attachment4);
+
+  console.log('✓ Created sample ticket attachments');
   console.log('Database seeding completed!');
 }
