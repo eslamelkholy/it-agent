@@ -65,6 +65,12 @@ export class Ticket {
   @Column({ name: 'external_ticket_id', type: 'varchar', length: 255, nullable: true })
   externalTicketId: string;
 
+  @Column({ name: 'resolution_steps', type: 'text', nullable: true })
+  resolutionSteps: string;
+
+  @Column({ name: 'knowledge_base_article_id', type: 'uuid', nullable: true })
+  knowledgeBaseArticleId: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

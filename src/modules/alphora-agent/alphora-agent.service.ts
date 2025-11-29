@@ -26,8 +26,14 @@ export class AlphoraAgentService {
     const analysis = await this.ticketProcessor.processTicket(ticket);
 
     if (analysis.decision === AgentDecision.AUTOMATE) {
-      await this.psaService.updateTicketStatus(ticket.id, TicketStatus.RESOLVED);
-      this.logger.log(`Ticket ${ticket.id} is automatable. Action plan ready for execution.`);
+      const topKbArticle = analysis.context.relevantDocs[0];
+
+      await this.psaService.updateTicket(ticket.id, {
+        status: TicketStatus.RESOLVED,
+        resolutionSteps: topKbArticle?.content,
+        knowledgeBaseArticleId: topKbArticle?.id,
+      });
+      this.logger.log(`Ticket ${ticket.id} resolved using KB article: ${topKbArticle?.title || 'N/A'}`);
     } else if (analysis.decision === AgentDecision.ESCALATE) {
       await this.psaService.updateTicketStatus(ticket.id, TicketStatus.IN_PROGRESS);
       this.logger.warn(`Ticket ${ticket.id} escalated to human technician.`);
