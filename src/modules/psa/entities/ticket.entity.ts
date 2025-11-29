@@ -12,6 +12,7 @@ import { Client } from '../../client/entities/client.entity';
 import { RmmDevice } from '../../rmm/entities/rmm-device.entity';
 import { User } from '../../user/entities/user.entity';
 import { TicketAttachment } from './ticket-attachment.entity';
+import { KnowledgeBase } from '../../rag/entities/knowledge-base.entity';
 
 export enum TicketStatus {
   NEW = 'new',
@@ -88,6 +89,10 @@ export class Ticket {
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'assigned_to' })
   assignedUser: User;
+
+  @ManyToOne(() => KnowledgeBase, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'knowledge_base_article_id' })
+  knowledgeBaseArticle: KnowledgeBase;
 
   @OneToMany(() => TicketAttachment, (attachment) => attachment.ticket)
   attachments: TicketAttachment[];
