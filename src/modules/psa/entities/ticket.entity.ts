@@ -15,6 +15,7 @@ import { TicketAttachment } from './ticket-attachment.entity';
 
 export enum TicketStatus {
   NEW = 'new',
+  PROCESSING = 'processing',
   IN_PROGRESS = 'in_progress',
   RESOLVED = 'resolved',
   CLOSED = 'closed',

@@ -135,6 +135,7 @@ export class PsaService {
     
     const byStatus = {
       [TicketStatus.NEW]: 0,
+      [TicketStatus.PROCESSING]: 0,
       [TicketStatus.IN_PROGRESS]: 0,
       [TicketStatus.RESOLVED]: 0,
       [TicketStatus.CLOSED]: 0,

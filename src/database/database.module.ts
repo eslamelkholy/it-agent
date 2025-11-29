@@ -14,7 +14,7 @@ import { ConfigService } from '@nestjs/config';
         database: configService.get('DB_NAME', 'it_agent'),
         autoLoadEntities: true,
         synchronize: configService.get('NODE_ENV') === 'development',
-        logging: configService.get('NODE_ENV') === 'development',
+        logging: false,
       }),
       inject: [ConfigService],
     }),
