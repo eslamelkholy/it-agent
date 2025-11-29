@@ -50,4 +50,5 @@ export const AUTOMATABLE_INTENTS: Set<TicketIntent> = new Set([
   TicketIntent.SYSTEM_RESTART,
   TicketIntent.BACKUP_FAILURE,
   TicketIntent.SOFTWARE_INSTALL,
+  TicketIntent.NETWORK_ISSUE,
 ]);

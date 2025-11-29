@@ -138,6 +138,34 @@ npm run db:seed
 4. **Action Plan**: 4 steps using `active_directory` and `secure_messaging` tools
 
 
+## Adding New Automatable Intents
+
+By default, only these intents are automated:
+- `PASSWORD_RESET`
+- `SYSTEM_RESTART`
+- `BACKUP_FAILURE`
+- `SOFTWARE_INSTALL`
+
+Other intents (like `NETWORK_ISSUE`, `EMAIL_ISSUE`, etc.) are escalated to human technicians.
+
+**To add a new automatable intent:**
+
+1. Edit `src/modules/classification/prompts.ts`
+2. Add the intent to `AUTOMATABLE_INTENTS`:
+```typescript
+export const AUTOMATABLE_INTENTS: Set<TicketIntent> = new Set([
+  TicketIntent.PASSWORD_RESET,
+  TicketIntent.SYSTEM_RESTART,
+  TicketIntent.BACKUP_FAILURE,
+  TicketIntent.SOFTWARE_INSTALL,
+  TicketIntent.NETWORK_ISSUE,  // Add new intent here
+]);
+```
+
+3. Ensure a knowledge base article exists for that category in `src/modules/rag/knowledge-seed.service.ts`
+
+
 ## Follow up improvements
 - Integrate with RMM APIs to auto-execute actions
 - Add more PSA and RMM tool integrations
+- Knowledge base ingestion UI for technicians
