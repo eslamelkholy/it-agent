@@ -5,9 +5,15 @@ import { EmbeddingService } from './embedding.service';
 import { VectorStoreService } from './vector-store.service';
 import { RagOrchestratorService } from './rag-orchestrator.service';
 import { KnowledgeSeedService } from './knowledge-seed.service';
+import { ClassificationModule } from '../classification';
+import { ActionsModule } from '../actions';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([KnowledgeBase])],
+  imports: [
+    TypeOrmModule.forFeature([KnowledgeBase]),
+    ClassificationModule,
+    ActionsModule,
+  ],
   providers: [
     EmbeddingService,
     VectorStoreService,

@@ -51,10 +51,17 @@ export class PsaService {
   }
 
   async findTicketById(id: string): Promise<Ticket> {
-    const ticket = await this.ticketRepository.findOne({
-      where: { id },
-      relations: ['client', 'rmmDevice', 'assignedUser', 'attachments'],
-    });
+    const ticket = await this.ticketRepository
+      .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.client', 'client')
+      .leftJoinAndSelect('ticket.rmmDevice', 'rmmDevice')
+      .leftJoinAndSelect('ticket.assignedUser', 'assignedUser')
+      .leftJoinAndSelect('ticket.attachments', 'attachments')
+      .leftJoin('ticket.knowledgeBaseArticle', 'kb')
+      .addSelect(['kb.id', 'kb.content'])
+      .where('ticket.id = :id', { id })
+      .getOne();
+
     if (!ticket) {
       throw new NotFoundException(`Ticket with ID "${id}" not found`);
     }
@@ -62,10 +69,16 @@ export class PsaService {
   }
 
   async findTicketByExternalId(externalTicketId: string): Promise<Ticket | null> {
-    return this.ticketRepository.findOne({
-      where: { externalTicketId },
-      relations: ['client', 'rmmDevice', 'assignedUser', 'attachments'],
-    });
+    return this.ticketRepository
+      .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.client', 'client')
+      .leftJoinAndSelect('ticket.rmmDevice', 'rmmDevice')
+      .leftJoinAndSelect('ticket.assignedUser', 'assignedUser')
+      .leftJoinAndSelect('ticket.attachments', 'attachments')
+      .leftJoin('ticket.knowledgeBaseArticle', 'kb')
+      .addSelect(['kb.id', 'kb.content'])
+      .where('ticket.externalTicketId = :externalTicketId', { externalTicketId })
+      .getOne();
   }
 
   async updateTicket(id: string, updateDto: UpdateTicketDto): Promise<Ticket> {
@@ -135,6 +148,7 @@ export class PsaService {
     
     const byStatus = {
       [TicketStatus.NEW]: 0,
+      [TicketStatus.PROCESSING]: 0,
       [TicketStatus.IN_PROGRESS]: 0,
       [TicketStatus.RESOLVED]: 0,
       [TicketStatus.CLOSED]: 0,

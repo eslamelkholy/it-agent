@@ -70,15 +70,19 @@ npm run db:seed
 │  4. RAG QUERY                                                                │
 │     RagOrchestratorService.runRagQuery(title, body)                         │
 │                                                                              │
-│     a) CLASSIFY INTENT                                                       │
-│        - Scan keywords → password_reset, system_restart, backup_failure...  │
-│        - Calculate confidence score (0-1)                                   │
-│        - Determine if automatable                                           │
+│     a) LLM INTENT CLASSIFICATION (ClassificationModule)                     │
+│        - LlmClassifierService calls OpenAI gpt-4.1-mini                     │
+│        - Returns: intent, confidence (0-1), reasoning                       │
+│        - Determines if automatable (password_reset, system_restart, etc.)   │
 │                                                                              │
 │     b) VECTOR SEARCH                                                         │
-│        - Generate embedding for ticket text (OpenAI API)                    │
+│        - Generate embedding for ticket text (OpenAI text-embedding-3-small) │
 │        - Search knowledge_base table using pgvector similarity              │
 │        - Return top 5 matching KB articles                                  │
+│                                                                              │
+│     c) ACTION SUGGESTIONS (ActionsModule)                                    │
+│        - ActionsService.getSuggestedActions(intent)                         │
+│        - ActionsService.getHistoricalResolutions(intent)                    │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -137,4 +141,3 @@ npm run db:seed
 ## Follow up improvements
 - Integrate with RMM APIs to auto-execute actions
 - Add more PSA and RMM tool integrations
-- Enhance intent classification (LLM-based classifier)
