@@ -8,6 +8,7 @@ import {
   RelevantDocument,
   HistoricalResolution,
 } from './interfaces/rag.interfaces';
+import { LlmClassifierService } from '../classification';
 
 export interface RagQueryResult {
   classification: IntentClassification;
@@ -18,49 +19,6 @@ export interface RagQueryResult {
 @Injectable()
 export class RagOrchestratorService {
   private readonly logger = new Logger(RagOrchestratorService.name);
-
-  private readonly intentKeywords: Record<TicketIntent, string[]> = {
-    [TicketIntent.PASSWORD_RESET]: [
-      'password', 'expired', 'reset', 'login', 'locked out',
-      'cannot sign in', 'credentials', 'authentication',
-    ],
-    [TicketIntent.SYSTEM_RESTART]: [
-      'restart', 'reboot', 'frozen', 'not responding',
-      'hang', 'stuck', 'unresponsive',
-    ],
-    [TicketIntent.BACKUP_FAILURE]: [
-      'backup', 'failed', 'backup job', 'restore', 'data loss', 'backup error',
-    ],
-    [TicketIntent.ACCESS_REQUEST]: [
-      'access', 'permission', 'new user', 'account setup', 'grant access', 'onboarding',
-    ],
-    [TicketIntent.SOFTWARE_INSTALL]: [
-      'install', 'software', 'application', 'program', 'update', 'upgrade', 'patch',
-    ],
-    [TicketIntent.NETWORK_ISSUE]: [
-      'network', 'internet', 'connection', 'wifi', 'ethernet', 'dns', 'cannot connect', 'shared drive',
-    ],
-    [TicketIntent.EMAIL_ISSUE]: [
-      'email', 'outlook', 'mailbox', 'exchange', 'cannot send', 'not receiving',
-    ],
-    [TicketIntent.HARDWARE_ISSUE]: [
-      'hardware', 'monitor', 'keyboard', 'mouse', 'printer', 'screen', 'display',
-    ],
-    [TicketIntent.VPN_ISSUE]: [
-      'vpn', 'remote access', 'anyconnect', 'tunnel', 'disconnect', 'remote work',
-    ],
-    [TicketIntent.PERFORMANCE_ISSUE]: [
-      'slow', 'performance', 'lag', 'boot time', 'takes long', 'freezing',
-    ],
-    [TicketIntent.UNKNOWN]: [],
-  };
-
-  private readonly automatableIntents: Set<TicketIntent> = new Set([
-    TicketIntent.PASSWORD_RESET,
-    TicketIntent.SYSTEM_RESTART,
-    TicketIntent.BACKUP_FAILURE,
-    TicketIntent.SOFTWARE_INSTALL,
-  ]);
 
   private readonly intentToCategoryMap: Record<TicketIntent, KnowledgeCategory> = {
     [TicketIntent.PASSWORD_RESET]: KnowledgeCategory.PASSWORD_RESET,
@@ -76,12 +34,15 @@ export class RagOrchestratorService {
     [TicketIntent.UNKNOWN]: KnowledgeCategory.GENERAL,
   };
 
-  constructor(private readonly vectorStore: VectorStoreService) {}
+  constructor(
+    private readonly vectorStore: VectorStoreService,
+    private readonly llmClassifier: LlmClassifierService,
+  ) {}
 
   async runRagQuery(title: string, body: string): Promise<RagQueryResult> {
     this.logger.log(`Running RAG query for: ${title}`);
 
-    const classification = this.classifyIntent(title, body);
+    const classification = await this.llmClassifier.classifyTicket(title, body);
     this.logger.log(`Classified intent: ${classification.intent} (confidence: ${classification.confidence})`);
 
     const category = this.intentToCategoryMap[classification.intent];
@@ -96,45 +57,6 @@ export class RagOrchestratorService {
       classification,
       context,
       rawResults,
-    };
-  }
-
-  private classifyIntent(title: string, body: string): IntentClassification {
-    const combinedText = `${title} ${body}`.toLowerCase();
-    const intentScores = new Map<TicketIntent, number>();
-
-    for (const [intent, keywords] of Object.entries(this.intentKeywords)) {
-      let score = 0;
-      for (const keyword of keywords) {
-        if (combinedText.includes(keyword.toLowerCase())) {
-          score += 1;
-        }
-      }
-      if (score > 0) {
-        intentScores.set(intent as TicketIntent, score);
-      }
-    }
-
-    let bestIntent = TicketIntent.UNKNOWN;
-    let bestScore = 0;
-
-    for (const [intent, score] of intentScores) {
-      if (score > bestScore) {
-        bestScore = score;
-        bestIntent = intent;
-      }
-    }
-
-    const maxPossibleScore = this.intentKeywords[bestIntent]?.length || 1;
-    const confidence = bestIntent === TicketIntent.UNKNOWN
-      ? 0
-      : Math.min(bestScore / maxPossibleScore, 1);
-
-    return {
-      intent: bestIntent,
-      confidence: Math.round(confidence * 100) / 100,
-      isAutomatable: this.automatableIntents.has(bestIntent) && confidence >= 0.3,
-      reasoning: this.generateReasoning(bestIntent, bestScore, confidence),
     };
   }
 
@@ -276,14 +198,5 @@ export class RagOrchestratorService {
     };
 
     return historicalData[intent] || [];
-  }
-
-  private generateReasoning(intent: TicketIntent, matchCount: number, confidence: number): string {
-    if (intent === TicketIntent.UNKNOWN) {
-      return 'No clear intent pattern detected. Manual review required.';
-    }
-
-    const confidenceLevel = confidence >= 0.7 ? 'high' : confidence >= 0.4 ? 'medium' : 'low';
-    return `Detected ${intent} intent with ${confidenceLevel} confidence based on ${matchCount} keyword matches.`;
   }
 }
