@@ -8,18 +8,43 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { PsaService } from './psa.service';
 import { CreateTicketDto, UpdateTicketDto, CreateTicketAttachmentDto } from './dto';
 import { TicketStatus } from './entities/ticket.entity';
+import { AlphoraAgentService } from '../alphora-agent';
 
 @Controller('psa')
 export class PsaController {
-  constructor(private readonly psaService: PsaService) {}
+  private readonly logger = new Logger(PsaController.name);
+
+  constructor(
+    private readonly psaService: PsaService,
+    private readonly alphoraAgent: AlphoraAgentService,
+  ) {}
 
   @Post('tickets')
   createTicket(@Body() createDto: CreateTicketDto) {
     return this.psaService.createTicket(createDto);
+  }
+
+  @Post('webhook/tickets')
+  async handleTicketWebhook(@Body() createDto: CreateTicketDto) {
+    this.logger.log(`Webhook received: ${createDto.title}`);
+
+    const ticket = await this.psaService.createTicket(createDto);
+    this.logger.log(`Ticket created: ${ticket.id}`);
+
+    setImmediate(async () => {
+      try {
+        await this.alphoraAgent.handleNewTicket(ticket);
+      } catch (error) {
+        this.logger.error(`Agent processing failed for ticket ${ticket.id}:`, error);
+      }
+    });
+
+    return ticket;
   }
 
   @Get('tickets')
