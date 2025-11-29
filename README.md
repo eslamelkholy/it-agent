@@ -132,3 +132,9 @@ npm run db:seed
 2. **KB Search**: Finds "Active Directory Password Reset Procedure" (similarity: 0.92)
 3. **Decision**: AUTOMATE ✓
 4. **Action Plan**: 4 steps using `active_directory` and `secure_messaging` tools
+
+
+## Follow up improvements
+- Integrate with RMM APIs to auto-execute actions
+- Add more PSA and RMM tool integrations
+- Enhance intent classification (LLM-based classifier)
