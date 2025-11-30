@@ -110,3 +110,11 @@ export const HISTORICAL_RESOLUTIONS: Record<TicketIntent, HistoricalResolution[]
   [TicketIntent.PERFORMANCE_ISSUE]: [],
   [TicketIntent.UNKNOWN]: [],
 };
+
+export const AUTOMATABLE_INTENTS: Set<TicketIntent> = new Set([
+  TicketIntent.PASSWORD_RESET,
+  TicketIntent.SYSTEM_RESTART,
+  TicketIntent.BACKUP_FAILURE,
+  TicketIntent.SOFTWARE_INSTALL,
+  TicketIntent.NETWORK_ISSUE,
+]);

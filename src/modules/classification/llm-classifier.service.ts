@@ -7,13 +7,13 @@ import {
 import {
   INTENT_CLASSIFICATION_SYSTEM_PROMPT,
   buildTicketClassificationPrompt,
-  AUTOMATABLE_INTENTS,
 } from './prompts';
 import {
   OpenAIMessage,
   OpenAIChatResponse,
   ClassificationResponse,
 } from './dto';
+import { AUTOMATABLE_INTENTS } from '../actions';
 
 @Injectable()
 export class LlmClassifierService {

@@ -45,10 +45,3 @@ ${body}
 Analyze the ticket and provide your classification in the required JSON format.`;
 };
 
-export const AUTOMATABLE_INTENTS: Set<TicketIntent> = new Set([
-  TicketIntent.PASSWORD_RESET,
-  TicketIntent.SYSTEM_RESTART,
-  TicketIntent.BACKUP_FAILURE,
-  TicketIntent.SOFTWARE_INSTALL,
-  TicketIntent.NETWORK_ISSUE,
-]);

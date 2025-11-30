@@ -150,7 +150,7 @@ Other intents (like `NETWORK_ISSUE`, `EMAIL_ISSUE`, etc.) are escalated to human
 
 **To add a new automatable intent:**
 
-1. Edit `src/modules/classification/prompts.ts`
+1. Edit `src/modules/actions/actions.ts`
 2. Add the intent to `AUTOMATABLE_INTENTS`:
 ```typescript
 export const AUTOMATABLE_INTENTS: Set<TicketIntent> = new Set([
